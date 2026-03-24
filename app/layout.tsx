@@ -14,10 +14,21 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Tushar Sharma | Backend Developer',
-  description: 'Backend Developer with hands-on experience building scalable REST APIs using ASP.NET Core, C#, and MySQL. Skilled in API design, authentication, database optimization and full-stack integration.',
-  keywords: ['Backend Developer', '.NET', 'ASP.NET Core', 'C#', 'REST API', 'MySQL', 'PostgreSQL'],
-  authors: [{ name: 'Tushar Sharma' }],
+  title: 'Anuj Singh | Backend Developer',
+  description: 'Backend Developer with hands-on experience in Laravel and ASP.NET Core, building scalable REST APIs, secure authentication systems, and efficient ERP solutions. Skilled in PHP, C#, MySQL, and full-stack development with a focus on performance, data integrity, and real-world applications.',
+  keywords: [
+    'Anuj Singh',
+    'Backend Developer',
+    'Laravel',
+    'PHP',
+    'REST API',
+    'MySQL',
+    'JWT',
+    'RBAC',
+    'ERP Development',
+    'Full Stack Developer'
+  ],
+  authors: [{ name: 'Anuj Singh' }],
   generator: 'v0.app',
   icons: {
     icon: [
