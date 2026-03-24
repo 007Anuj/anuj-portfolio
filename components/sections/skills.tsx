@@ -234,8 +234,8 @@ export function Skills() {
             >
               {[
                 { label: "Technologies", value: "25+", icon: Code2 },
-                { label: "Years Experience", value: "3+", icon: TrendingUp },
-                { label: "Projects Built", value: "15+", icon: Zap },
+                { label: "Years Experience", value: "2+", icon: TrendingUp },
+                { label: "Projects Built", value: "4+", icon: Zap },
                 { label: "Best Practices", value: "100%", icon: Shield },
               ].map((stat, index) => (
                 <motion.div
