@@ -22,7 +22,7 @@ export function Header() {
   const [scrollHeight, setScrollHeight] = useState(1)
 
   const { scrollY } = useScroll()
-  const headerOpacity = useTransform(scrollY, [0, 50], [0, 0.9])
+  const headerBgOpacity = useTransform(scrollY, [0, 50], [0, 0.95])
   const headerBlur = useTransform(scrollY, [0, 50], [0, 12])
   const scaleX = useTransform(scrollY, [0, scrollHeight], [0, 1])
 
@@ -60,14 +60,15 @@ export function Header() {
   return (
     <>
       <motion.header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled ? "border-b border-border/50" : "border-b border-transparent"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? "border-b border-border/20 shadow-lg" : "border-b border-transparent"
         }`}
         style={{
           backgroundColor: isScrolled
-            ? `rgba(var(--background-rgb), ${headerOpacity.get()})`
+            ? `rgba(var(--background-rgb, 0, 0, 0), ${headerBgOpacity.get()})`
             : "transparent",
           backdropFilter: isScrolled ? `blur(${headerBlur.get()}px)` : "none",
+          WebkitBackdropFilter: isScrolled ? `blur(${headerBlur.get()}px)` : "none",
         }}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -92,16 +93,20 @@ export function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={(e) => { e.preventDefault(); handleNavClick(item.href) }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-primary/10 ${
                     activeSection === item.href.slice(1)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-primary bg-primary/5"
+                      : "text-foreground/80 hover:text-foreground"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
-              <Button asChild size="sm">
+              <Button 
+                asChild 
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
                 <Link href="#contact" onClick={(e) => { e.preventDefault(); handleNavClick("#contact") }}>
                   <span className="flex items-center gap-2">Hire Me <Sparkles className="w-4 h-4" /></span>
                 </Link>
@@ -110,7 +115,12 @@ export function Header() {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-foreground hover:bg-primary/10"
+              >
                 {isMobileMenuOpen ? <X /> : <Menu />}
               </Button>
             </div>
@@ -121,22 +131,30 @@ export function Header() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-background/95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-6 md:hidden"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-x-0 top-16 bg-background/95 backdrop-blur-xl border-b border-border/20 z-40 flex flex-col items-center py-8 space-y-4 md:hidden shadow-xl"
             >
               {navItems.map(item => (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={(e) => { e.preventDefault(); handleNavClick(item.href) }}
-                  className="text-2xl font-medium hover:text-primary transition"
+                  className={`text-lg font-medium px-6 py-2 rounded-lg transition-all duration-200 hover:bg-primary/10 ${
+                    activeSection === item.href.slice(1)
+                      ? "text-primary bg-primary/5"
+                      : "text-foreground/80 hover:text-foreground"
+                  }`}
                 >
                   {item.label}
                 </Link>
               ))}
-              <Button asChild>
+              <Button 
+                asChild 
+                className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
                 <Link href="#contact" onClick={(e) => { e.preventDefault(); handleNavClick("#contact") }}>
                   Hire Me
                 </Link>
@@ -148,7 +166,7 @@ export function Header() {
 
       {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/50 to-primary/20 z-50 origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/70 to-primary/30 z-50 origin-left"
         style={{ scaleX }}
       />
     </>
