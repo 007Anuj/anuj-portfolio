@@ -158,7 +158,7 @@ export function Education() {
                       whileHover={{ x: 3 }}
                     >
                       <span className="w-1 h-1 rounded-full bg-primary" />
-                      Dr. APJ Abdul Kalam Technology University, Uttar Pradesh
+                      Dr. APJ Abdul Kalam Technical University, Uttar Pradesh
                     </motion.p>
 
                     {/* Timeline with enhanced styling */}
