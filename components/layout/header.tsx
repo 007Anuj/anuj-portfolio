@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
-import { Menu, X, Sparkles, Code, ChevronRight } from "lucide-react"
+import { Menu, X, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
@@ -19,71 +19,53 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
-  const [scrollHeight, setScrollHeight] = useState(1) // ✅ FIX
+  const [scrollHeight, setScrollHeight] = useState(1)
 
   const { scrollY } = useScroll()
-  
-  // Transform header background based on scroll
-  const headerOpacity = useTransform(scrollY, [0, 50], [0, 0.8])
+  const headerOpacity = useTransform(scrollY, [0, 50], [0, 0.9])
   const headerBlur = useTransform(scrollY, [0, 50], [0, 12])
+  const scaleX = useTransform(scrollY, [0, scrollHeight], [0, 1])
 
-  // ✅ FIX: calculate scroll height safely
+  // Update scrollHeight on resize
   useEffect(() => {
-    const updateHeight = () => {
-      setScrollHeight(document.body.scrollHeight - window.innerHeight)
-    }
-
+    const updateHeight = () => setScrollHeight(document.body.scrollHeight - window.innerHeight)
     updateHeight()
     window.addEventListener("resize", updateHeight)
-
     return () => window.removeEventListener("resize", updateHeight)
   }, [])
 
+  // Track active section
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
-
-      // Update active section based on scroll position
-      const sections = navItems.map((item) => item.href.slice(1))
+      const sections = navItems.map(item => item.href.slice(1))
       for (const section of sections.reverse()) {
-        const element = document.getElementById(section)
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          if (rect.top <= 100) {
-            setActiveSection(section)
-            break
-          }
+        const el = document.getElementById(section)
+        if (el && el.getBoundingClientRect().top <= 100) {
+          setActiveSection(section)
+          break
         }
       }
     }
-
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Close mobile menu when clicking a link
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false)
-    const element = document.querySelector(href)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-    }
+    const el = document.querySelector(href)
+    if (el) el.scrollIntoView({ behavior: "smooth" })
   }
-
-  // ✅ FIX: safe transform
-  const scaleX = useTransform(scrollY, [0, scrollHeight], [0, 1])
 
   return (
     <>
       <motion.header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
-            ? "border-b border-border/50"
-            : "border-b border-transparent"
+          isScrolled ? "border-b border-border/50" : "border-b border-transparent"
         }`}
         style={{
-          backgroundColor: isScrolled 
-            ? `rgba(var(--background-rgb), ${headerOpacity.get()})` 
+          backgroundColor: isScrolled
+            ? `rgba(var(--background-rgb), ${headerOpacity.get()})`
             : "transparent",
           backdropFilter: isScrolled ? `blur(${headerBlur.get()}px)` : "none",
         }}
@@ -97,130 +79,76 @@ export function Header() {
             {/* Logo */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
               <Link href="#home" className="flex items-center gap-2 group" onClick={() => handleNavClick("#home")}>
-                <div className="relative">
-                  <motion.div
-                    className="absolute -inset-1 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <span className="relative text-xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
-                    AS
-                    <motion.span
-                      className="text-primary inline-block"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      .
-                    </motion.span>
-                  </span>
-                </div>
-                <motion.div
-                  initial={{ width: 0 }}
-                  whileHover={{ width: "100%" }}
-                  className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-primary to-transparent"
-                />
+                <span className="text-xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+                  AS<span className="text-primary">.</span>
+                </span>
               </Link>
             </motion.div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item, index) => (
-                <motion.div
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-4">
+              {navItems.map(item => (
+                <Link
                   key={item.label}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  href={item.href}
+                  onClick={(e) => { e.preventDefault(); handleNavClick(item.href) }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeSection === item.href.slice(1)
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
-                  <Link
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavClick(item.href)
-                    }}
-                    className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 group ${
-                      activeSection === item.href.slice(1)
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <span className="relative z-10">{item.label}</span>
-
-                    {activeSection === item.href.slice(1) && (
-                      <motion.div
-                        layoutId="activeNav"
-                        className="absolute inset-0 bg-primary/10 rounded-lg"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-
-                    <motion.div
-                      className="absolute inset-0 bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    />
-
-                    <motion.div
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-6 transition-all duration-300"
-                    />
-                  </Link>
-                </motion.div>
+                  {item.label}
+                </Link>
               ))}
-            </div>
-
-            {/* CTA */}
-            <motion.div className="hidden md:block" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild size="sm" className="relative overflow-hidden group">
-                <Link href="#contact" onClick={(e) => {
-                  e.preventDefault()
-                  handleNavClick("#contact")
-                }}>
-                  <span className="relative z-10 flex items-center gap-2">
-                    Hire Me
-                    <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                  </span>
-                  <motion.div
-                    className="absolute inset-0 bg-primary/20"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.6 }}
-                  />
+              <Button asChild size="sm">
+                <Link href="#contact" onClick={(e) => { e.preventDefault(); handleNavClick("#contact") }}>
+                  <span className="flex items-center gap-2">Hire Me <Sparkles className="w-4 h-4" /></span>
                 </Link>
               </Button>
-            </motion.div>
+            </div>
 
-            {/* Mobile Button */}
-            <motion.div className="md:hidden" whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 {isMobileMenuOpen ? <X /> : <Menu />}
               </Button>
-            </motion.div>
+            </div>
           </div>
         </nav>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Overlay */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-              <div className="container px-4 py-4 space-y-2">
-                {navItems.map((item) => (
-                  <Link key={item.label} href={item.href} onClick={(e) => {
-                    e.preventDefault()
-                    handleNavClick(item.href)
-                  }}>
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-background/95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-6 md:hidden"
+            >
+              {navItems.map(item => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={(e) => { e.preventDefault(); handleNavClick(item.href) }}
+                  className="text-2xl font-medium hover:text-primary transition"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Button asChild>
+                <Link href="#contact" onClick={(e) => { e.preventDefault(); handleNavClick("#contact") }}>
+                  Hire Me
+                </Link>
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.header>
 
-      {/* ✅ FIXED Progress Bar */}
+      {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-primary/20 z-50 origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/50 to-primary/20 z-50 origin-left"
         style={{ scaleX }}
       />
     </>
