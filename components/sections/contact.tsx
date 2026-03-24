@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect  } from "react"
 import { Mail, Phone, Linkedin, Github, Send, CheckCircle, Sparkles, MessageCircle, MapPin, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -68,7 +68,11 @@ export function Contact() {
       [e.target.id]: e.target.value,
     })
   }
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
+  useEffect(() => {
+    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+  }, []);
   return (
     <section id="contact" className="py-24 md:py-32 relative overflow-hidden flex items-center justify-center">
       {/* Animated background elements */}
@@ -105,8 +109,8 @@ export function Contact() {
             key={i}
             className="absolute opacity-10"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * windowSize.width,
+              y: Math.random() * windowSize.height,
             }}
             animate={{
               y: [null, -30, 30, -30],
